@@ -1,65 +1,115 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+import { useLocations, Location } from "@/hooks/useLocations";
+import { LocationSearch } from "@/components/LocationSearch";
+import { WeatherCard } from "@/components/WeatherCard";
+import { WeatherDetailModal } from "@/components/WeatherDetailModal";
+import { ReplaceLocationDialog } from "@/components/ReplaceLocationDialog";
+import { GeocodingResult } from "@/lib/geocoding";
+import { WeatherData } from "@/lib/weather";
+import { motion, AnimatePresence } from "framer-motion";
+import { CloudRainWind } from "lucide-react";
 
 export default function Home() {
+  const { locations, removeLocation, replaceLocation, addLocation } = useLocations();
+
+  // 詳細表示モーダルのState
+  const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
+  const [selectedWeather, setSelectedWeather] = useState<WeatherData | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+
+  // 入れ替え用ダイアログのState
+  const [pendingLocation, setPendingLocation] = useState<GeocodingResult | null>(null);
+  const [isReplaceOpen, setIsReplaceOpen] = useState(false);
+
+  // 6件到達時に検索コンポーネントから呼ばれるコールバック
+  const handleAddRequireReplace = (loc: GeocodingResult) => {
+    setPendingLocation(loc);
+    setIsReplaceOpen(true);
+  };
+
+  // 入れ替えダイアログで「これと入れ替える」を選択した時
+  const handleReplaceConfirm = (oldId: number, newLoc: GeocodingResult) => {
+    replaceLocation(oldId, newLoc);
+    setIsReplaceOpen(false);
+    setPendingLocation(null);
+  };
+
+  // カードをクリックした時の詳細表示
+  const handleCardClick = (loc: Location, weather: WeatherData) => {
+    setSelectedLocation(loc);
+    setSelectedWeather(weather);
+    setIsDetailOpen(true);
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <main className="min-h-screen bg-zinc-50 dark:bg-black py-12 px-4 sm:px-6 lg:px-8 font-sans selection:bg-blue-100 dark:selection:bg-blue-900">
+      <div className="max-w-6xl mx-auto">
+        {/* ヘッダー */}
+        <header className="flex flex-col items-center mb-12 space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-blue-100 dark:bg-blue-900/40 rounded-2xl text-blue-600 dark:text-blue-400">
+              <CloudRainWind className="w-8 h-8" />
+            </div>
+            <h1 className="text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50">
+              Weather Dashboard
+            </h1>
+          </div>
+          <p className="text-zinc-500 dark:text-zinc-400 text-center max-w-xl">
+            Open-Meteo APIを活用した高機能天気ダッシュボード。<br className="hidden sm:block" />
+            都市を検索して追加し、最大6件までの気象情報をリアルタイムで管理します。
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+        </header>
+
+        {/* 検索セクション */}
+        <section className="mb-12 relative z-20">
+          <LocationSearch onAddRequireReplace={handleAddRequireReplace} />
+        </section>
+
+        {/* 天気カードグリッド */}
+        <section className="relative z-10">
+          <motion.div
+            layout
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+            <AnimatePresence mode="popLayout">
+              {locations.map((loc) => (
+                <WeatherCard
+                  key={loc.id}
+                  location={loc}
+                  onRemove={removeLocation}
+                  onClick={handleCardClick}
+                />
+              ))}
+            </AnimatePresence>
+          </motion.div>
+          {locations.length === 0 && (
+            <div className="text-center text-zinc-500 py-12 flex flex-col items-center">
+              <div className="w-16 h-16 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mb-4">
+                <CloudRainWind className="w-8 h-8 text-zinc-400" />
+              </div>
+              <p>地点が登録されていません。<br />検索バーから都市を追加してください。</p>
+            </div>
+          )}
+        </section>
+      </div>
+
+      {/* モーダル群 */}
+      <WeatherDetailModal
+        location={selectedLocation}
+        weather={selectedWeather}
+        isOpen={isDetailOpen}
+        onClose={() => setIsDetailOpen(false)}
+      />
+
+      <ReplaceLocationDialog
+        isOpen={isReplaceOpen}
+        newLocation={pendingLocation}
+        existingLocations={locations}
+        onReplace={handleReplaceConfirm}
+        onCancel={() => setIsReplaceOpen(false)}
+      />
+    </main>
   );
 }
