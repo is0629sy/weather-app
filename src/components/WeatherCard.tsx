@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { fetchWeather, WeatherData } from "@/lib/weather";
-import { getWeatherIcon, getWeatherDescription } from "@/lib/weatherIcons";
+import { getWeatherIcon, getWeatherDescription, getWeatherColor } from "@/lib/weatherIcons";
 import { Location } from "@/hooks/useLocations";
 import { Droplets, Wind, X } from "lucide-react";
 import { format, parseISO } from "date-fns";
@@ -119,7 +119,7 @@ export function WeatherCard({ location, onRemove, onClick }: WeatherCardProps) {
                 {/* 現在の天気 */}
                 <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-4">
-                        <CurrentIcon className="w-12 h-12 text-zinc-700 dark:text-zinc-300" />
+                        <CurrentIcon className={`w-12 h-12 ${getWeatherColor(current.weatherCode)}`} />
                         <div>
                             <div className="text-3xl sm:text-4xl font-bold text-zinc-900 dark:text-zinc-50 tracking-tighter">
                                 {Math.round(current.temperature2m)}°
@@ -154,7 +154,7 @@ export function WeatherCard({ location, onRemove, onClick }: WeatherCardProps) {
                                 <span className="text-zinc-500 dark:text-zinc-400 mb-1">
                                     {isTomorrow ? "明日" : format(date, "E", { locale: ja })}
                                 </span>
-                                <DailyIcon className="w-5 h-5 mb-1 text-zinc-700 dark:text-zinc-300" />
+                                <DailyIcon className={`w-5 h-5 mb-1 ${getWeatherColor(daily.weatherCode[index + 1])}`} />
                                 <div className="flex flex-col items-center">
                                     <span className="font-semibold text-zinc-900 dark:text-zinc-50">
                                         {Math.round(daily.temperature2mMax[index + 1])}°

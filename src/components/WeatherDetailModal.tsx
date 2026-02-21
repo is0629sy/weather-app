@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { Location } from "@/hooks/useLocations";
 import { WeatherData } from "@/lib/weather";
-import { getWeatherIcon } from "@/lib/weatherIcons";
+import { getWeatherIcon, getWeatherColor } from "@/lib/weatherIcons";
 import { format, parseISO } from "date-fns";
 import { ja } from "date-fns/locale";
 import { X } from "lucide-react";
@@ -107,7 +107,7 @@ export function WeatherDetailModal({
                                             <span className={`text-sm mb-3 ${isNow ? "text-blue-600 dark:text-blue-400 font-bold" : "text-zinc-500 dark:text-zinc-400"}`}>
                                                 {isNow ? "現在" : format(date, "H:mm")}
                                             </span>
-                                            <Icon className={`w-8 h-8 mb-3 ${isNow ? "text-blue-500" : "text-zinc-700 dark:text-zinc-300"}`} />
+                                            <Icon className={`w-8 h-8 mb-3 ${isNow ? "text-blue-500" : getWeatherColor(data.code)}`} />
                                             <span className={`text-lg font-semibold ${isNow ? "text-blue-700 dark:text-blue-300" : "text-zinc-900 dark:text-zinc-50"}`}>
                                                 {Math.round(data.temp)}°
                                             </span>

@@ -86,3 +86,46 @@ export function getWeatherDescription(code: number): string {
         default: return "不明";
     }
 }
+
+export function getWeatherColor(code: number): string {
+    switch (code) {
+        case 0:
+            return "text-amber-500 dark:text-amber-400"; // 快晴
+        case 1:
+        case 2:
+            return "text-amber-400 dark:text-amber-300"; // 晴れ時々曇り、曇り
+        case 3:
+            return "text-zinc-500 dark:text-zinc-400"; // どん曇り
+        case 45:
+        case 48:
+            return "text-slate-400 dark:text-slate-500"; // 霧
+        case 51:
+        case 53:
+        case 55:
+        case 56:
+        case 57:
+            return "text-sky-400 dark:text-sky-300"; // 霧雨
+        case 61:
+        case 63:
+        case 65:
+        case 66:
+        case 67:
+        case 80:
+        case 81:
+        case 82:
+            return "text-blue-500 dark:text-blue-400"; // 雨、にわか雨
+        case 71:
+        case 73:
+        case 75:
+        case 77:
+        case 85:
+        case 86:
+            return "text-cyan-400 dark:text-cyan-300"; // 雪
+        case 95:
+        case 96:
+        case 99:
+            return "text-indigo-500 dark:text-indigo-400"; // 雷雨
+        default:
+            return "text-zinc-400 dark:text-zinc-500"; // 不明
+    }
+}
