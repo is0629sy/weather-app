@@ -71,7 +71,7 @@ export function WeatherDetailModal({
                         animate={{ opacity: 1, y: "-50%", x: "-50%" }}
                         exit={{ opacity: 0, y: "100%", x: "-50%" }}
                         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                        className="fixed top-1/2 left-1/2 z-50 w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl p-6 md:p-8"
+                        className="fixed top-1/2 left-1/2 z-50 w-[95vw] sm:w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl p-5 md:p-8"
                     >
                         <button
                             onClick={onClose}
@@ -80,8 +80,8 @@ export function WeatherDetailModal({
                             <X className="w-6 h-6 text-zinc-500" />
                         </button>
 
-                        <div className="mb-8 pt-2">
-                            <h2 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50 mb-2">
+                        <div className="mb-8 pt-2 pr-10">
+                            <h2 className="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-zinc-50 mb-2">
                                 {location.name}
                             </h2>
                             <p className="text-zinc-500 dark:text-zinc-400">
@@ -100,8 +100,8 @@ export function WeatherDetailModal({
                                         <div
                                             key={data.time}
                                             className={`flex flex-col items-center justify-between min-w-[80px] p-4 rounded-2xl snap-start shrink-0 border ${isNow
-                                                    ? "bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800"
-                                                    : "bg-zinc-50 border-zinc-200 dark:bg-zinc-800/50 dark:border-zinc-700/50"
+                                                ? "bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800"
+                                                : "bg-zinc-50 border-zinc-200 dark:bg-zinc-800/50 dark:border-zinc-700/50"
                                                 }`}
                                         >
                                             <span className={`text-sm mb-3 ${isNow ? "text-blue-600 dark:text-blue-400 font-bold" : "text-zinc-500 dark:text-zinc-400"}`}>

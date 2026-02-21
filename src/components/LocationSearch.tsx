@@ -79,7 +79,7 @@ export function LocationSearch({ onAddRequireReplace }: LocationSearchProps) {
                         if (results.length > 0) setIsOpen(true);
                     }}
                     placeholder="都市名で検索 (東京, London...)"
-                    className="block w-full pl-12 pr-4 py-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-full text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 shadow-sm transition-all focus:shadow-md"
+                    className="block w-full pl-12 pr-4 py-3 sm:py-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-full text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 shadow-sm transition-all focus:shadow-md"
                 />
             </div>
 
@@ -95,8 +95,8 @@ export function LocationSearch({ onAddRequireReplace }: LocationSearchProps) {
                                         onClick={() => handleSelect(loc)}
                                         disabled={isAdded}
                                         className={`w-full text-left px-4 py-3 flex items-center gap-3 rounded-xl transition-colors ${isAdded
-                                                ? "opacity-50 cursor-not-allowed bg-zinc-50 dark:bg-zinc-800/30"
-                                                : "hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                                            ? "opacity-50 cursor-not-allowed bg-zinc-50 dark:bg-zinc-800/30"
+                                            : "hover:bg-zinc-100 dark:hover:bg-zinc-800"
                                             }`}
                                     >
                                         <MapPin className="w-5 h-5 text-zinc-400 shrink-0" />

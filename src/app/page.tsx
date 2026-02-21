@@ -77,7 +77,7 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-zinc-50 dark:bg-black py-12 px-4 sm:px-6 lg:px-8 font-sans selection:bg-blue-100 dark:selection:bg-blue-900">
+    <main className="min-h-screen bg-zinc-50 dark:bg-black py-6 sm:py-12 px-4 sm:px-6 lg:px-8 font-sans selection:bg-blue-100 dark:selection:bg-blue-900">
       <div className="max-w-6xl mx-auto">
         {/* ヘッダー */}
         <header className="flex flex-col items-center mb-12 space-y-4">
@@ -85,7 +85,7 @@ export default function Home() {
             <div className="p-3 bg-blue-100 dark:bg-blue-900/40 rounded-2xl text-blue-600 dark:text-blue-400">
               <CloudRainWind className="w-8 h-8" />
             </div>
-            <h1 className="text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50">
+            <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50">
               Weather Dashboard
             </h1>
           </div>

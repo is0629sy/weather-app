@@ -60,13 +60,13 @@ export function WeatherCard({ location, onRemove, onClick }: WeatherCardProps) {
 
     if (loading) {
         return (
-            <div ref={setNodeRef} style={style} className="h-64 rounded-2xl bg-white/50 dark:bg-zinc-800/50 p-6 shadow-sm border border-zinc-200 dark:border-zinc-700 animate-pulse" />
+            <div ref={setNodeRef} style={style} className="h-auto min-h-[16rem] rounded-2xl bg-white/50 dark:bg-zinc-800/50 p-5 sm:p-6 shadow-sm border border-zinc-200 dark:border-zinc-700 animate-pulse" />
         );
     }
 
     if (error || !weather) {
         return (
-            <div ref={setNodeRef} style={style} className="h-64 flex items-center justify-center rounded-2xl bg-red-50 dark:bg-red-900/10 p-6 text-red-500 border border-red-200 dark:border-red-900 relative">
+            <div ref={setNodeRef} style={style} className="h-auto min-h-[16rem] flex items-center justify-center rounded-2xl bg-red-50 dark:bg-red-900/10 p-5 sm:p-6 text-red-500 border border-red-200 dark:border-red-900 relative">
                 データの取得に失敗しました
                 <button
                     onClick={(e) => {
@@ -93,9 +93,9 @@ export function WeatherCard({ location, onRemove, onClick }: WeatherCardProps) {
             className={`relative cursor-pointer group ${isDragging ? "cursor-grabbing" : ""}`}
             onClick={() => onClick(location, weather)}
         >
-            <div className="h-full rounded-2xl bg-white dark:bg-zinc-900 p-6 shadow-md border border-zinc-200 dark:border-zinc-800 hover:shadow-lg transition-all hover:-translate-y-1">
+            <div className="h-full rounded-2xl bg-white dark:bg-zinc-900 p-5 sm:p-6 shadow-md border border-zinc-200 dark:border-zinc-800 hover:shadow-lg transition-all hover:-translate-y-1">
                 {/* ヘッダー: 都市名と削除ボタン */}
-                <div className="flex justify-between items-start mb-4">
+                <div className="flex justify-between items-start mb-4 gap-2">
                     <div>
                         <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-50">
                             {location.name}
@@ -109,7 +109,7 @@ export function WeatherCard({ location, onRemove, onClick }: WeatherCardProps) {
                             e.stopPropagation();
                             onRemove(location.id);
                         }}
-                        className="p-1 rounded-full opacity-0 group-hover:opacity-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 hover:text-red-500 transition-all focus:opacity-100"
+                        className="p-2 sm:p-1 rounded-full opacity-100 md:opacity-0 md:group-hover:opacity-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 hover:text-red-500 transition-all focus:opacity-100"
                         aria-label="削除"
                     >
                         <X className="w-5 h-5" />
@@ -121,7 +121,7 @@ export function WeatherCard({ location, onRemove, onClick }: WeatherCardProps) {
                     <div className="flex items-center gap-4">
                         <CurrentIcon className="w-12 h-12 text-zinc-700 dark:text-zinc-300" />
                         <div>
-                            <div className="text-4xl font-bold text-zinc-900 dark:text-zinc-50 tracking-tighter">
+                            <div className="text-3xl sm:text-4xl font-bold text-zinc-900 dark:text-zinc-50 tracking-tighter">
                                 {Math.round(current.temperature2m)}°
                             </div>
                             <div className="text-sm text-zinc-600 dark:text-zinc-400">

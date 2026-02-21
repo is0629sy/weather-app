@@ -37,12 +37,12 @@ export function ReplaceLocationDialog({
                         initial={{ opacity: 0, scale: 0.95, y: "-50%", x: "-50%" }}
                         animate={{ opacity: 1, scale: 1, y: "-50%", x: "-50%" }}
                         exit={{ opacity: 0, scale: 0.95, y: "-50%", x: "-50%" }}
-                        className="fixed top-1/2 left-1/2 z-[60] w-full max-w-lg bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl overflow-hidden"
+                        className="fixed top-1/2 left-1/2 z-[60] w-[95vw] sm:w-full max-w-lg bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl overflow-hidden"
                     >
-                        <div className="p-6 md:p-8">
+                        <div className="p-5 md:p-8">
                             <div className="flex justify-between items-start mb-6">
                                 <div>
-                                    <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-50">
+                                    <h3 className="text-lg sm:text-xl font-bold text-zinc-900 dark:text-zinc-50">
                                         登録上限 (6件) に達しています
                                     </h3>
                                     <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-2">
