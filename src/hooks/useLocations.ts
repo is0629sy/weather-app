@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { GeocodingResult } from "@/lib/geocoding";
 
-export interface Location extends GeocodingResult { }
+export type Location = GeocodingResult;
 
 interface LocationState {
     locations: Location[];

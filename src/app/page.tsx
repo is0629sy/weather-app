@@ -8,11 +8,25 @@ import { WeatherDetailModal } from "@/components/WeatherDetailModal";
 import { ReplaceLocationDialog } from "@/components/ReplaceLocationDialog";
 import { GeocodingResult } from "@/lib/geocoding";
 import { WeatherData } from "@/lib/weather";
-import { motion, AnimatePresence } from "framer-motion";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  rectSortingStrategy,
+} from "@dnd-kit/sortable";
 import { CloudRainWind } from "lucide-react";
 
 export default function Home() {
-  const { locations, removeLocation, replaceLocation, addLocation } = useLocations();
+  const { locations, removeLocation, replaceLocation, reorderLocations } = useLocations();
 
   // 詳細表示モーダルのState
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
@@ -22,6 +36,25 @@ export default function Home() {
   // 入れ替え用ダイアログのState
   const [pendingLocation, setPendingLocation] = useState<GeocodingResult | null>(null);
   const [isReplaceOpen, setIsReplaceOpen] = useState(false);
+
+  // dnd-kit設定
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = locations.findIndex((l) => l.id === active.id);
+      const newIndex = locations.findIndex((l) => l.id === over.id);
+
+      reorderLocations(arrayMove(locations, oldIndex, newIndex));
+    }
+  };
 
   // 6件到達時に検索コンポーネントから呼ばれるコールバック
   const handleAddRequireReplace = (loc: GeocodingResult) => {
@@ -69,21 +102,27 @@ export default function Home() {
 
         {/* 天気カードグリッド */}
         <section className="relative z-10">
-          <motion.div
-            layout
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
           >
-            <AnimatePresence mode="popLayout">
-              {locations.map((loc) => (
-                <WeatherCard
-                  key={loc.id}
-                  location={loc}
-                  onRemove={removeLocation}
-                  onClick={handleCardClick}
-                />
-              ))}
-            </AnimatePresence>
-          </motion.div>
+            <SortableContext
+              items={locations.map((l) => l.id)}
+              strategy={rectSortingStrategy}
+            >
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {locations.map((loc) => (
+                  <WeatherCard
+                    key={loc.id}
+                    location={loc}
+                    onRemove={removeLocation}
+                    onClick={handleCardClick}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
           {locations.length === 0 && (
             <div className="text-center text-zinc-500 py-12 flex flex-col items-center">
               <div className="w-16 h-16 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mb-4">

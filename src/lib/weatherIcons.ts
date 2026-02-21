@@ -7,7 +7,6 @@ import {
     CloudRain,
     CloudSnow,
     CloudLightning,
-    Snowflake,
     HelpCircle,
 } from "lucide-react";
 

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/static-components */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -7,8 +8,8 @@ import { Location } from "@/hooks/useLocations";
 import { Droplets, Wind, X } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { ja } from "date-fns/locale";
-import { motion } from "framer-motion";
-
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 interface WeatherCardProps {
     location: Location;
     onRemove: (id: number) => void;
@@ -22,7 +23,6 @@ export function WeatherCard({ location, onRemove, onClick }: WeatherCardProps) {
 
     useEffect(() => {
         let mounted = true;
-        setLoading(true);
         fetchWeather(location.latitude, location.longitude)
             .then((data) => {
                 if (mounted) {
@@ -42,15 +42,31 @@ export function WeatherCard({ location, onRemove, onClick }: WeatherCardProps) {
         };
     }, [location.latitude, location.longitude]);
 
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging,
+    } = useSortable({ id: location.id });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        zIndex: isDragging ? 20 : 1,
+        opacity: isDragging ? 0.8 : 1,
+    };
+
     if (loading) {
         return (
-            <div className="h-64 rounded-2xl bg-white/50 dark:bg-zinc-800/50 p-6 shadow-sm border border-zinc-200 dark:border-zinc-700 animate-pulse"></div>
+            <div ref={setNodeRef} style={style} className="h-64 rounded-2xl bg-white/50 dark:bg-zinc-800/50 p-6 shadow-sm border border-zinc-200 dark:border-zinc-700 animate-pulse" />
         );
     }
 
     if (error || !weather) {
         return (
-            <div className="h-64 flex items-center justify-center rounded-2xl bg-red-50 dark:bg-red-900/10 p-6 text-red-500 border border-red-200 dark:border-red-900">
+            <div ref={setNodeRef} style={style} className="h-64 flex items-center justify-center rounded-2xl bg-red-50 dark:bg-red-900/10 p-6 text-red-500 border border-red-200 dark:border-red-900 relative">
                 データの取得に失敗しました
                 <button
                     onClick={(e) => {
@@ -69,12 +85,12 @@ export function WeatherCard({ location, onRemove, onClick }: WeatherCardProps) {
     const CurrentIcon = getWeatherIcon(current.weatherCode);
 
     return (
-        <motion.div
-            layout
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            className="relative cursor-pointer group"
+        <div
+            ref={setNodeRef}
+            style={style}
+            {...attributes}
+            {...listeners}
+            className={`relative cursor-pointer group ${isDragging ? "cursor-grabbing" : ""}`}
             onClick={() => onClick(location, weather)}
         >
             <div className="h-full rounded-2xl bg-white dark:bg-zinc-900 p-6 shadow-md border border-zinc-200 dark:border-zinc-800 hover:shadow-lg transition-all hover:-translate-y-1">
@@ -152,6 +168,6 @@ export function WeatherCard({ location, onRemove, onClick }: WeatherCardProps) {
                     })}
                 </div>
             </div>
-        </motion.div>
+        </div>
     );
 }

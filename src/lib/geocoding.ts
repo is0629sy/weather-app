@@ -28,7 +28,7 @@ export async function searchLocations(query: string, language: string = "ja"): P
         return [];
     }
 
-    return data.results.map((item: any) => ({
+    return data.results.map((item: GeocodingResult) => ({
         id: item.id,
         name: item.name,
         latitude: item.latitude,
