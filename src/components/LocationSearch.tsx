@@ -83,8 +83,15 @@ export function LocationSearch({ onLocationSelect }: LocationSearchProps) {
             },
             (error) => {
                 setIsSearching(false);
-                console.error(error);
-                alert("位置情報の取得を許可してください。");
+                // console.error(error) は Next.js のエラーオーバーレイを表示させてしまうため、
+                // 開発時・運用時のトレース用には warn または文字列として出力します。
+                console.warn("Geolocation Error:", error.code, error.message);
+
+                if (error.code === error.PERMISSION_DENIED) {
+                    alert("位置情報の利用が許可されていません。ブラウザの設定で許可してください。");
+                } else {
+                    alert("位置情報を取得できませんでした。");
+                }
             }
         );
     };
