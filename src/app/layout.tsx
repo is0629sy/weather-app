@@ -6,7 +6,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Weather Dashboard",
-  description: "Advanced weather dashboard using Open-Meteo API",
+  description: "Advanced weather dashboard using OpenWeatherMap API",
 };
 
 export default function RootLayout({

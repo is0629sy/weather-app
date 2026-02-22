@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { searchLocations, reverseGeocode, GeocodingResult } from "@/lib/geocoding";
+import { searchLocationsAction, reverseGeocodeAction } from "@/lib/actions";
+import { GeocodingResult } from "@/lib/geocoding";
 import { Search, MapPin, Loader2 } from "lucide-react";
 import { useLocations } from "@/hooks/useLocations";
 
@@ -33,7 +34,7 @@ export function LocationSearch({ onLocationSelect }: LocationSearchProps) {
             if (query.trim().length >= 2) {
                 setIsSearching(true);
                 try {
-                    const res = await searchLocations(query);
+                    const res = await searchLocationsAction(query);
                     setResults(res);
                     setIsOpen(true);
                 } catch (err) {
@@ -67,7 +68,7 @@ export function LocationSearch({ onLocationSelect }: LocationSearchProps) {
             async (position) => {
                 const { latitude, longitude } = position.coords;
                 try {
-                    const loc = await reverseGeocode(latitude, longitude);
+                    const loc = await reverseGeocodeAction(latitude, longitude);
                     if (loc) {
                         onLocationSelect(loc);
                     } else {

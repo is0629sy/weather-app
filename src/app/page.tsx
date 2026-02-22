@@ -7,7 +7,8 @@ import { WeatherCard } from "@/components/WeatherCard";
 import { WeatherDetailModal } from "@/components/WeatherDetailModal";
 import { ReplaceLocationDialog } from "@/components/ReplaceLocationDialog";
 import { GeocodingResult } from "@/lib/geocoding";
-import { WeatherData, fetchWeather } from "@/lib/weather";
+import { WeatherData } from "@/lib/weather";
+import { getWeatherAction } from "@/lib/actions";
 import {
   DndContext,
   closestCenter,
@@ -80,7 +81,7 @@ export default function Home() {
   // 現在地取得時や検索結果選択時などのプレビュー表示
   const handleLocationPreview = async (loc: GeocodingResult) => {
     try {
-      const weather = await fetchWeather(loc.latitude, loc.longitude);
+      const weather = await getWeatherAction(loc.latitude, loc.longitude);
       setSelectedLocation(loc);
       setSelectedWeather(weather);
       setIsPreviewMode(true);
@@ -115,7 +116,7 @@ export default function Home() {
             </h1>
           </div>
           <p className="text-zinc-500 dark:text-zinc-400 text-center max-w-xl">
-            Open-Meteo APIを活用した高機能天気ダッシュボード。<br className="hidden sm:block" />
+            OpenWeatherMap APIを活用した高機能天気ダッシュボード。<br className="hidden sm:block" />
             都市を検索して追加し、最大6件までの気象情報をリアルタイムで管理します。
           </p>
         </header>

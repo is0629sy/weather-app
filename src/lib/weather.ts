@@ -22,42 +22,101 @@ export interface WeatherData {
 }
 
 export async function fetchWeather(lat: number, lon: number): Promise<WeatherData> {
-    const params = new URLSearchParams({
-        latitude: lat.toString(),
-        longitude: lon.toString(),
-        current: "temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,precipitation",
-        hourly: "temperature_2m,weather_code",
-        daily: "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max",
-        timezone: "auto",
-    });
-
-    const res = await fetch(`https://api.open-meteo.com/v1/forecast?${params.toString()}`);
-    if (!res.ok) {
-        throw new Error("Failed to fetch weather data");
+    const API_KEY = process.env.OPENWEATHER_API_KEY;
+    if (!API_KEY) {
+        console.error("OpenWeatherMap API key is missing. Please check your .env.local file.");
+        throw new Error("OpenWeatherMap API key is not configured");
     }
 
-    const data = await res.json();
+    try {
+        // One Call API 3.0 is recommended, but 2.5 is also common.
+        // Here we use current weather and 5 day forecast as a fallback if One Call is not accessible.
+        // However, to keep it simple and fulfill the requirement, we will try to fetch both.
 
-    return {
-        current: {
-            time: data.current.time,
-            temperature2m: data.current.temperature_2m,
-            relativeHumidity2m: data.current.relative_humidity_2m,
-            weatherCode: data.current.weather_code,
-            windSpeed10m: data.current.wind_speed_10m,
-            precipitation: data.current.precipitation,
-        },
-        daily: {
-            time: data.daily.time,
-            weatherCode: data.daily.weather_code,
-            temperature2mMax: data.daily.temperature_2m_max,
-            temperature2mMin: data.daily.temperature_2m_min,
-            precipitationProbabilityMax: data.daily.precipitation_probability_max,
-        },
-        hourly: {
-            time: data.hourly.time,
-            temperature2m: data.hourly.temperature_2m,
-            weatherCode: data.hourly.weather_code,
-        },
-    };
+        // Fetch Current Weather
+        const currentRes = await fetch(
+            `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric&lang=ja`
+        );
+        if (!currentRes.ok) {
+            const errorData = await currentRes.json().catch(() => ({}));
+            console.error("OpenWeatherMap Current API Error:", currentRes.status, errorData);
+            throw new Error(`Failed to fetch current weather: ${currentRes.status}`);
+        }
+        const currentData = await currentRes.json();
+
+        // Fetch 5 Day / 3 Hour Forecast
+        const forecastRes = await fetch(
+            `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric&lang=ja`
+        );
+        if (!forecastRes.ok) {
+            const errorData = await forecastRes.json().catch(() => ({}));
+            console.error("OpenWeatherMap Forecast API Error:", forecastRes.status, errorData);
+            throw new Error(`Failed to fetch forecast data: ${forecastRes.status}`);
+        }
+        const forecastData = await forecastRes.json();
+
+        // Process daily data (group by date)
+        const dailyMap = new Map();
+        forecastData.list.forEach((item: any) => {
+            const date = item.dt_txt.split(" ")[0];
+            const time = item.dt_txt.split(" ")[1]; // "HH:mm:ss"
+
+            if (!dailyMap.has(date)) {
+                dailyMap.set(date, {
+                    tempMax: item.main.temp_max,
+                    tempMin: item.main.temp_min,
+                    weatherCode: item.weather[0].id,
+                    pop: item.pop || 0,
+                    representativeTime: time
+                });
+            } else {
+                const entry = dailyMap.get(date);
+                entry.tempMax = Math.max(entry.tempMax, item.main.temp_max);
+                entry.tempMin = Math.min(entry.tempMin, item.main.temp_min);
+                entry.pop = Math.max(entry.pop, item.pop || 0);
+
+                // 日中（12時〜15時）の天気を優先的に代表値として採用する
+                const hour = parseInt(time.split(":")[0]);
+                const currentRepHour = parseInt(entry.representativeTime.split(":")[0]);
+
+                // 12時に近い方を優先
+                if (Math.abs(hour - 12) < Math.abs(currentRepHour - 12)) {
+                    entry.weatherCode = item.weather[0].id;
+                    entry.representativeTime = time;
+                }
+            }
+        });
+
+        const dailyDates = Array.from(dailyMap.keys()).slice(0, 5);
+        const dailyTempsMax = dailyDates.map(d => dailyMap.get(d).tempMax);
+        const dailyTempsMin = dailyDates.map(d => dailyMap.get(d).tempMin);
+        const dailyCodes = dailyDates.map(d => dailyMap.get(d).weatherCode);
+        const dailyPops = dailyDates.map(d => dailyMap.get(d).pop * 100);
+
+        return {
+            current: {
+                time: new Date(currentData.dt * 1000).toISOString(),
+                temperature2m: currentData.main.temp,
+                relativeHumidity2m: currentData.main.humidity,
+                weatherCode: currentData.weather[0].id,
+                windSpeed10m: currentData.wind.speed,
+                precipitation: currentData.rain ? (currentData.rain["1h"] || 0) : 0,
+            },
+            daily: {
+                time: dailyDates,
+                weatherCode: dailyCodes,
+                temperature2mMax: dailyTempsMax,
+                temperature2mMin: dailyTempsMin,
+                precipitationProbabilityMax: dailyPops,
+            },
+            hourly: {
+                time: forecastData.list.map((item: any) => item.dt_txt),
+                temperature2m: forecastData.list.map((item: any) => item.main.temp),
+                weatherCode: forecastData.list.map((item: any) => item.weather[0].id),
+            },
+        };
+    } catch (error) {
+        console.error("fetchWeather error:", error);
+        throw error;
+    }
 }

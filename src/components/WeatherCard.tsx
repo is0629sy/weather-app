@@ -2,7 +2,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fetchWeather, WeatherData } from "@/lib/weather";
+import { WeatherData } from "@/lib/weather";
+import { getWeatherAction } from "@/lib/actions";
 import { getWeatherIcon, getWeatherDescription, getWeatherColor } from "@/lib/weatherIcons";
 import { Location } from "@/hooks/useLocations";
 import { Droplets, Wind, X, GripVertical } from "lucide-react";
@@ -23,7 +24,7 @@ export function WeatherCard({ location, onRemove, onClick }: WeatherCardProps) {
 
     useEffect(() => {
         let mounted = true;
-        fetchWeather(location.latitude, location.longitude)
+        getWeatherAction(location.latitude, location.longitude)
             .then((data) => {
                 if (mounted) {
                     setWeather(data);
