@@ -32,7 +32,7 @@ export default function Home() {
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const [selectedWeather, setSelectedWeather] = useState<WeatherData | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
-  const [isFromCurrentLocation, setIsFromCurrentLocation] = useState(false);
+  const [isPreviewMode, setIsPreviewMode] = useState(false);
 
   // 入れ替え用ダイアログのState
   const [pendingLocation, setPendingLocation] = useState<GeocodingResult | null>(null);
@@ -70,21 +70,20 @@ export default function Home() {
     setPendingLocation(null);
   };
 
-  // カードをクリックした時の詳細表示
   const handleCardClick = (loc: Location, weather: WeatherData) => {
     setSelectedLocation(loc);
     setSelectedWeather(weather);
-    setIsFromCurrentLocation(false);
+    setIsPreviewMode(false);
     setIsDetailOpen(true);
   };
 
-  // 現在地取得時のハンドリング
-  const handleCurrentLocation = async (loc: GeocodingResult) => {
+  // 現在地取得時や検索結果選択時などのプレビュー表示
+  const handleLocationPreview = async (loc: GeocodingResult) => {
     try {
       const weather = await fetchWeather(loc.latitude, loc.longitude);
       setSelectedLocation(loc);
       setSelectedWeather(weather);
-      setIsFromCurrentLocation(true);
+      setIsPreviewMode(true);
       setIsDetailOpen(true);
     } catch (err) {
       console.error(err);
@@ -124,8 +123,7 @@ export default function Home() {
         {/* 検索セクション */}
         <section className="mb-12 relative z-20">
           <LocationSearch
-            onAddRequireReplace={handleAddRequireReplace}
-            onCurrentLocation={handleCurrentLocation}
+            onLocationSelect={handleLocationPreview}
           />
         </section>
 
@@ -169,7 +167,7 @@ export default function Home() {
         weather={selectedWeather}
         isOpen={isDetailOpen}
         onClose={() => setIsDetailOpen(false)}
-        showAddButton={isFromCurrentLocation && !locations.some(l => l.id === selectedLocation?.id)}
+        showAddButton={isPreviewMode && !locations.some(l => l.id === selectedLocation?.id)}
         onAdd={handleAddLocationFromDetail}
       />
 

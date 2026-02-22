@@ -6,17 +6,16 @@ import { Search, MapPin, Loader2 } from "lucide-react";
 import { useLocations } from "@/hooks/useLocations";
 
 interface LocationSearchProps {
-    onAddRequireReplace: (location: GeocodingResult) => void;
-    onCurrentLocation: (location: GeocodingResult) => void;
+    onLocationSelect: (location: GeocodingResult) => void;
 }
 
-export function LocationSearch({ onAddRequireReplace, onCurrentLocation }: LocationSearchProps) {
+export function LocationSearch({ onLocationSelect }: LocationSearchProps) {
     const [query, setQuery] = useState("");
     const [results, setResults] = useState<GeocodingResult[]>([]);
     const [isSearching, setIsSearching] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
 
-    const { locations, addLocation } = useLocations();
+    const { locations } = useLocations();
     const wrapperRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -52,12 +51,7 @@ export function LocationSearch({ onAddRequireReplace, onCurrentLocation }: Locat
     }, [query]);
 
     const handleSelect = (loc: GeocodingResult) => {
-        if (locations.length >= 6) {
-            // 6件制限にかかる場合は入れ替えモーダルを呼ぶ
-            onAddRequireReplace(loc);
-        } else {
-            addLocation(loc);
-        }
+        onLocationSelect(loc);
         setQuery("");
         setIsOpen(false);
     };
@@ -75,7 +69,7 @@ export function LocationSearch({ onAddRequireReplace, onCurrentLocation }: Locat
                 try {
                     const loc = await reverseGeocode(latitude, longitude);
                     if (loc) {
-                        onCurrentLocation(loc);
+                        onLocationSelect(loc);
                     } else {
                         alert("現在地の取得に失敗しました。");
                     }
