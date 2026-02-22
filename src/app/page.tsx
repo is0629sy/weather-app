@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useLocations, Location } from "@/hooks/useLocations";
 import { LocationSearch } from "@/components/LocationSearch";
 import { WeatherCard } from "@/components/WeatherCard";
 import { WeatherDetailModal } from "@/components/WeatherDetailModal";
 import { ReplaceLocationDialog } from "@/components/ReplaceLocationDialog";
 import { GeocodingResult } from "@/lib/geocoding";
-import { WeatherData } from "@/lib/weather";
+import { WeatherData, fetchWeather } from "@/lib/weather";
 import {
   DndContext,
   closestCenter,
@@ -26,12 +26,13 @@ import {
 import { CloudRainWind } from "lucide-react";
 
 export default function Home() {
-  const { locations, removeLocation, replaceLocation, reorderLocations } = useLocations();
+  const { locations, addLocation, removeLocation, replaceLocation, reorderLocations } = useLocations();
 
   // 詳細表示モーダルのState
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const [selectedWeather, setSelectedWeather] = useState<WeatherData | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [isFromCurrentLocation, setIsFromCurrentLocation] = useState(false);
 
   // 入れ替え用ダイアログのState
   const [pendingLocation, setPendingLocation] = useState<GeocodingResult | null>(null);
@@ -73,7 +74,32 @@ export default function Home() {
   const handleCardClick = (loc: Location, weather: WeatherData) => {
     setSelectedLocation(loc);
     setSelectedWeather(weather);
+    setIsFromCurrentLocation(false);
     setIsDetailOpen(true);
+  };
+
+  // 現在地取得時のハンドリング
+  const handleCurrentLocation = async (loc: GeocodingResult) => {
+    try {
+      const weather = await fetchWeather(loc.latitude, loc.longitude);
+      setSelectedLocation(loc);
+      setSelectedWeather(weather);
+      setIsFromCurrentLocation(true);
+      setIsDetailOpen(true);
+    } catch (err) {
+      console.error(err);
+      alert("天気データの取得に失敗しました。");
+    }
+  };
+
+  // 詳細モーダルから地点を追加する
+  const handleAddLocationFromDetail = (loc: Location) => {
+    if (locations.length >= 6) {
+      handleAddRequireReplace(loc);
+    } else {
+      addLocation(loc);
+    }
+    setIsDetailOpen(false);
   };
 
   return (
@@ -97,7 +123,10 @@ export default function Home() {
 
         {/* 検索セクション */}
         <section className="mb-12 relative z-20">
-          <LocationSearch onAddRequireReplace={handleAddRequireReplace} />
+          <LocationSearch
+            onAddRequireReplace={handleAddRequireReplace}
+            onCurrentLocation={handleCurrentLocation}
+          />
         </section>
 
         {/* 天気カードグリッド */}
@@ -140,6 +169,8 @@ export default function Home() {
         weather={selectedWeather}
         isOpen={isDetailOpen}
         onClose={() => setIsDetailOpen(false)}
+        showAddButton={isFromCurrentLocation && !locations.some(l => l.id === selectedLocation?.id)}
+        onAdd={handleAddLocationFromDetail}
       />
 
       <ReplaceLocationDialog

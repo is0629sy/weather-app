@@ -14,6 +14,8 @@ interface WeatherDetailModalProps {
     weather: WeatherData | null;
     isOpen: boolean;
     onClose: () => void;
+    showAddButton?: boolean;
+    onAdd?: (location: Location) => void;
 }
 
 export function WeatherDetailModal({
@@ -21,6 +23,8 @@ export function WeatherDetailModal({
     weather,
     isOpen,
     onClose,
+    showAddButton,
+    onAdd,
 }: WeatherDetailModalProps) {
     // ESCキーで閉じる
     useEffect(() => {
@@ -117,10 +121,18 @@ export function WeatherDetailModal({
                             </div>
                         </div>
 
-                        <div className="mt-6 flex justify-end">
+                        <div className="mt-6 flex justify-between gap-4">
+                            {showAddButton && location && onAdd && (
+                                <button
+                                    onClick={() => onAdd(location)}
+                                    className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full font-medium transition-colors"
+                                >
+                                    この地点を追加する
+                                </button>
+                            )}
                             <button
                                 onClick={onClose}
-                                className="px-6 py-2 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-900 text-white rounded-full font-medium transition-colors"
+                                className="px-6 py-2 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-900 text-white rounded-full font-medium transition-colors ml-auto"
                             >
                                 閉じる
                             </button>

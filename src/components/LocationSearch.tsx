@@ -1,15 +1,16 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { searchLocations, GeocodingResult } from "@/lib/geocoding";
+import { searchLocations, reverseGeocode, GeocodingResult } from "@/lib/geocoding";
 import { Search, MapPin, Loader2 } from "lucide-react";
 import { useLocations } from "@/hooks/useLocations";
 
 interface LocationSearchProps {
     onAddRequireReplace: (location: GeocodingResult) => void;
+    onCurrentLocation: (location: GeocodingResult) => void;
 }
 
-export function LocationSearch({ onAddRequireReplace }: LocationSearchProps) {
+export function LocationSearch({ onAddRequireReplace, onCurrentLocation }: LocationSearchProps) {
     const [query, setQuery] = useState("");
     const [results, setResults] = useState<GeocodingResult[]>([]);
     const [isSearching, setIsSearching] = useState(false);
@@ -61,6 +62,38 @@ export function LocationSearch({ onAddRequireReplace }: LocationSearchProps) {
         setIsOpen(false);
     };
 
+    const handleCurrentLocation = () => {
+        if (!navigator.geolocation) {
+            alert("お使いのブラウザは位置情報に対応していません。");
+            return;
+        }
+
+        setIsSearching(true);
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                const { latitude, longitude } = position.coords;
+                try {
+                    const loc = await reverseGeocode(latitude, longitude);
+                    if (loc) {
+                        onCurrentLocation(loc);
+                    } else {
+                        alert("現在地の取得に失敗しました。");
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert("現在地の取得中にエラーが発生しました。");
+                } finally {
+                    setIsSearching(false);
+                }
+            },
+            (error) => {
+                setIsSearching(false);
+                console.error(error);
+                alert("位置情報の取得を許可してください。");
+            }
+        );
+    };
+
     return (
         <div className="relative w-full max-w-md mx-auto z-30" ref={wrapperRef}>
             <div className="relative">
@@ -79,8 +112,16 @@ export function LocationSearch({ onAddRequireReplace }: LocationSearchProps) {
                         if (results.length > 0) setIsOpen(true);
                     }}
                     placeholder="都市名で検索 (東京, London...)"
-                    className="block w-full pl-12 pr-4 py-3 sm:py-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-full text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 shadow-sm transition-all focus:shadow-md"
+                    className="block w-full pl-12 pr-12 py-3 sm:py-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-full text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 shadow-sm transition-all focus:shadow-md"
                 />
+                <button
+                    onClick={handleCurrentLocation}
+                    disabled={isSearching}
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-zinc-400 hover:text-blue-500 transition-colors disabled:opacity-50"
+                    title="現在地を取得"
+                >
+                    <MapPin className="h-5 w-5" />
+                </button>
             </div>
 
             {isOpen && results.length > 0 && (
