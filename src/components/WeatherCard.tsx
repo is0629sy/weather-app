@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { fetchWeather, WeatherData } from "@/lib/weather";
 import { getWeatherIcon, getWeatherDescription, getWeatherColor } from "@/lib/weatherIcons";
 import { Location } from "@/hooks/useLocations";
-import { Droplets, Wind, X } from "lucide-react";
+import { Droplets, Wind, X, GripVertical } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { ja } from "date-fns/locale";
 import { useSortable } from "@dnd-kit/sortable";
@@ -88,21 +88,33 @@ export function WeatherCard({ location, onRemove, onClick }: WeatherCardProps) {
         <div
             ref={setNodeRef}
             style={style}
-            {...attributes}
-            {...listeners}
-            className={`relative cursor-pointer group ${isDragging ? "cursor-grabbing" : ""}`}
-            onClick={() => onClick(location, weather)}
+            className={`relative group ${isDragging ? "z-50" : "z-10"}`}
         >
-            <div className="h-full rounded-2xl bg-white dark:bg-zinc-900 p-5 sm:p-6 shadow-md border border-zinc-200 dark:border-zinc-800 hover:shadow-lg transition-all hover:-translate-y-1">
-                {/* ヘッダー: 都市名と削除ボタン */}
+            <div
+                className={`h-full rounded-2xl bg-white dark:bg-zinc-900 p-5 sm:p-6 shadow-md border border-zinc-200 dark:border-zinc-800 hover:shadow-lg transition-all ${!isDragging ? "hover:-translate-y-1" : ""} cursor-pointer`}
+                onClick={() => onClick(location, weather)}
+            >
+                {/* ヘッダー: 都市名、ドラッグハンドル、削除ボタン */}
                 <div className="flex justify-between items-start mb-4 gap-2">
-                    <div>
-                        <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-50">
-                            {location.name}
-                        </h2>
-                        <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                            {location.country} {location.admin1 ? `, ${location.admin1}` : ""}
-                        </p>
+                    <div className="flex items-start gap-3">
+                        {/* ドラッグハンドル */}
+                        <div
+                            {...attributes}
+                            {...listeners}
+                            className="p-1 -ml-1 rounded-md cursor-grab active:cursor-grabbing text-zinc-300 hover:text-zinc-500 dark:text-zinc-600 dark:hover:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                            onClick={(e) => e.stopPropagation()}
+                            aria-label="ドラッグして並べ替え"
+                        >
+                            <GripVertical className="w-5 h-5" />
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-50">
+                                {location.name}
+                            </h2>
+                            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                                {location.country} {location.admin1 ? `, ${location.admin1}` : ""}
+                            </p>
+                        </div>
                     </div>
                     <button
                         onClick={(e) => {
