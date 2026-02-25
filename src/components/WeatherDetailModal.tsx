@@ -6,7 +6,7 @@ import { WeatherData } from "@/lib/weather";
 import { getWeatherIcon, getWeatherColor } from "@/lib/weatherIcons";
 import { format, parseISO } from "date-fns";
 import { ja } from "date-fns/locale";
-import { X, Gauge, Droplets, Wind } from "lucide-react";
+import { X, Gauge, Droplets, Wind, Thermometer } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface WeatherDetailModalProps {
@@ -43,21 +43,16 @@ export function WeatherDetailModal({
 
     if (!location || !weather) return null;
 
-    // 現在時刻から24時間分のデータを抽出
     const now = new Date();
-    const currentIndex = weather.hourly.time.findIndex(
-        (timeStr) => new Date(timeStr) > now
-    );
-
-    // 過去すぎる場合は0から、そうでない場合は現在の時間前後から24件取得
-    const startIndex = Math.max(0, currentIndex - 1);
+    // 未来の予報のみを抽出（24時間分 = 3時間間隔で8個）
     const hourlyData = weather.hourly.time
-        .slice(startIndex, startIndex + 24)
         .map((timeStr, i) => ({
             time: timeStr,
-            temp: weather.hourly.temperature2m[startIndex + i],
-            code: weather.hourly.weatherCode[startIndex + i],
-        }));
+            temp: weather.hourly.temperature2m[i],
+            code: weather.hourly.weatherCode[i],
+        }))
+        .filter((item) => new Date(item.time) > now)
+        .slice(0, 8);
 
     return (
         <AnimatePresence>
@@ -94,7 +89,16 @@ export function WeatherDetailModal({
                         </div>
 
                         {/* 現在の状況詳細 */}
-                        <div className="grid grid-cols-3 gap-4 mb-8">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+                            <div className="bg-zinc-50 dark:bg-zinc-800/50 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-700/50">
+                                <div className="flex items-center gap-2 text-zinc-500 dark:text-zinc-400 mb-1">
+                                    <Thermometer className="w-4 h-4" />
+                                    <span className="text-sm font-medium">気温</span>
+                                </div>
+                                <div className="text-xl font-bold text-zinc-900 dark:text-zinc-50">
+                                    {Math.round(weather.current.temperature2m)}°
+                                </div>
+                            </div>
                             <div className="bg-zinc-50 dark:bg-zinc-800/50 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-700/50">
                                 <div className="flex items-center gap-2 text-zinc-500 dark:text-zinc-400 mb-1">
                                     <Droplets className="w-4 h-4" />
@@ -130,24 +134,20 @@ export function WeatherDetailModal({
 
                         <div className="relative">
                             <div className="flex gap-4 overflow-x-auto pb-6 no-scrollbar snap-x">
-                                {hourlyData.map((data, idx) => {
+                                {hourlyData.map((data) => {
                                     const date = parseISO(data.time);
                                     const Icon = getWeatherIcon(data.code);
-                                    const isNow = idx === 0 && currentIndex > 0;
 
                                     return (
                                         <div
                                             key={data.time}
-                                            className={`flex flex-col items-center justify-between min-w-[80px] p-4 rounded-2xl snap-start shrink-0 border ${isNow
-                                                ? "bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800"
-                                                : "bg-zinc-50 border-zinc-200 dark:bg-zinc-800/50 dark:border-zinc-700/50"
-                                                }`}
+                                            className="flex flex-col items-center justify-between min-w-[80px] p-4 rounded-2xl snap-start shrink-0 border bg-zinc-50 border-zinc-200 dark:bg-zinc-800/50 dark:border-zinc-700/50"
                                         >
-                                            <span className={`text-sm mb-3 ${isNow ? "text-blue-600 dark:text-blue-400 font-bold" : "text-zinc-500 dark:text-zinc-400"}`}>
-                                                {isNow ? "現在" : format(date, "H:mm")}
+                                            <span className="text-sm mb-3 text-zinc-500 dark:text-zinc-400">
+                                                {format(date, "H:mm")}
                                             </span>
-                                            <Icon className={`w-8 h-8 mb-3 ${isNow ? "text-blue-500" : getWeatherColor(data.code)}`} />
-                                            <span className={`text-lg font-semibold ${isNow ? "text-blue-700 dark:text-blue-300" : "text-zinc-900 dark:text-zinc-50"}`}>
+                                            <Icon className={`w-8 h-8 mb-3 ${getWeatherColor(data.code)}`} />
+                                            <span className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
                                                 {Math.round(data.temp)}°
                                             </span>
                                         </div>

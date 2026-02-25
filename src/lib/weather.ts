@@ -112,7 +112,7 @@ export async function fetchWeather(lat: number, lon: number): Promise<WeatherDat
                 precipitationProbabilityMax: dailyPops,
             },
             hourly: {
-                time: forecastData.list.map((item: any) => item.dt_txt),
+                time: forecastData.list.map((item: any) => new Date(item.dt * 1000).toISOString()),
                 temperature2m: forecastData.list.map((item: any) => item.main.temp),
                 weatherCode: forecastData.list.map((item: any) => item.weather[0].id),
             },
