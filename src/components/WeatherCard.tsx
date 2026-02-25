@@ -102,7 +102,7 @@ export function WeatherCard({ location, onRemove, onClick }: WeatherCardProps) {
                         <div
                             {...attributes}
                             {...listeners}
-                            className="p-1 -ml-1 rounded-md cursor-grab active:cursor-grabbing text-zinc-300 hover:text-zinc-500 dark:text-zinc-600 dark:hover:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                            className="p-1 -ml-1 rounded-md cursor-grab active:cursor-grabbing text-zinc-300 hover:text-zinc-500 dark:text-zinc-600 dark:hover:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors touch-none"
                             onClick={(e) => e.stopPropagation()}
                             aria-label="ドラッグして並べ替え"
                         >
