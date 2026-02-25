@@ -6,7 +6,7 @@ import { WeatherData } from "@/lib/weather";
 import { getWeatherAction } from "@/lib/actions";
 import { getWeatherIcon, getWeatherDescription, getWeatherColor } from "@/lib/weatherIcons";
 import { Location } from "@/hooks/useLocations";
-import { Droplets, Wind, X, GripVertical } from "lucide-react";
+import { Droplets, Wind, X, GripVertical, Gauge } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { ja } from "date-fns/locale";
 import { useSortable } from "@dnd-kit/sortable";
@@ -150,6 +150,10 @@ export function WeatherCard({ location, onRemove, onClick }: WeatherCardProps) {
                         <div className="flex items-center justify-end gap-1">
                             <Wind className="w-4 h-4" />
                             <span>{Math.round(current.windSpeed10m * 10) / 10}m/s</span>
+                        </div>
+                        <div className="flex items-center justify-end gap-1">
+                            <Gauge className="w-4 h-4" />
+                            <span>{current.pressure} hPa</span>
                         </div>
                     </div>
                 </div>

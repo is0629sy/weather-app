@@ -6,7 +6,7 @@ import { WeatherData } from "@/lib/weather";
 import { getWeatherIcon, getWeatherColor } from "@/lib/weatherIcons";
 import { format, parseISO } from "date-fns";
 import { ja } from "date-fns/locale";
-import { X } from "lucide-react";
+import { X, Gauge, Droplets, Wind } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface WeatherDetailModalProps {
@@ -89,8 +89,43 @@ export function WeatherDetailModal({
                                 {location.name}
                             </h2>
                             <p className="text-zinc-500 dark:text-zinc-400">
-                                {format(now, "yyyy年M月d日 (E)", { locale: ja })} の24時間予報
+                                {format(now, "yyyy年M月d日 (E)", { locale: ja })} の気象状況
                             </p>
+                        </div>
+
+                        {/* 現在の状況詳細 */}
+                        <div className="grid grid-cols-3 gap-4 mb-8">
+                            <div className="bg-zinc-50 dark:bg-zinc-800/50 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-700/50">
+                                <div className="flex items-center gap-2 text-zinc-500 dark:text-zinc-400 mb-1">
+                                    <Droplets className="w-4 h-4" />
+                                    <span className="text-sm font-medium">湿度</span>
+                                </div>
+                                <div className="text-xl font-bold text-zinc-900 dark:text-zinc-50">
+                                    {weather.current.relativeHumidity2m}%
+                                </div>
+                            </div>
+                            <div className="bg-zinc-50 dark:bg-zinc-800/50 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-700/50">
+                                <div className="flex items-center gap-2 text-zinc-500 dark:text-zinc-400 mb-1">
+                                    <Wind className="w-4 h-4" />
+                                    <span className="text-sm font-medium">風速</span>
+                                </div>
+                                <div className="text-xl font-bold text-zinc-900 dark:text-zinc-50">
+                                    {Math.round(weather.current.windSpeed10m * 10) / 10} m/s
+                                </div>
+                            </div>
+                            <div className="bg-zinc-50 dark:bg-zinc-800/50 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-700/50">
+                                <div className="flex items-center gap-2 text-zinc-500 dark:text-zinc-400 mb-1">
+                                    <Gauge className="w-4 h-4" />
+                                    <span className="text-sm font-medium">気圧</span>
+                                </div>
+                                <div className="text-xl font-bold text-zinc-900 dark:text-zinc-50">
+                                    {weather.current.pressure} hPa
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="mb-4">
+                            <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">24時間予報</h3>
                         </div>
 
                         <div className="relative">

@@ -6,6 +6,7 @@ export interface WeatherData {
         weatherCode: number;
         windSpeed10m: number;
         precipitation: number;
+        pressure: number;
     };
     daily: {
         time: string[];
@@ -101,6 +102,7 @@ export async function fetchWeather(lat: number, lon: number): Promise<WeatherDat
                 weatherCode: currentData.weather[0].id,
                 windSpeed10m: currentData.wind.speed,
                 precipitation: currentData.rain ? (currentData.rain["1h"] || 0) : 0,
+                pressure: currentData.main.pressure,
             },
             daily: {
                 time: dailyDates,
