@@ -54,6 +54,16 @@ export function WeatherDetailModal({
         .filter((item) => new Date(item.time) > now)
         .slice(0, 8);
 
+    // 日付ごとにグループ化
+    const groupedHourly: { [key: string]: { time: string; temp: number; code: number }[] } = {};
+    hourlyData.forEach(item => {
+        const dateKey = format(parseISO(item.time), "yyyy-MM-dd");
+        if (!groupedHourly[dateKey]) {
+            groupedHourly[dateKey] = [];
+        }
+        groupedHourly[dateKey].push(item);
+    });
+
     return (
         <AnimatePresence>
             {isOpen && (
@@ -132,28 +142,36 @@ export function WeatherDetailModal({
                             <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">24時間予報</h3>
                         </div>
 
-                        <div className="relative">
-                            <div className="flex gap-4 overflow-x-auto pb-6 no-scrollbar snap-x">
-                                {hourlyData.map((data) => {
-                                    const date = parseISO(data.time);
-                                    const Icon = getWeatherIcon(data.code);
+                        <div className="flex gap-6 overflow-x-auto pb-6 no-scrollbar snap-x">
+                            {Object.entries(groupedHourly).map(([dateKey, items]) => (
+                                <div key={dateKey} className="flex flex-col gap-2 min-w-max">
+                                    <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500 px-2 uppercase tracking-wider">
+                                        {format(parseISO(dateKey), "M/d (E)", { locale: ja })}
+                                    </span>
+                                    <div className="flex border border-zinc-200 dark:border-zinc-700/50 bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl overflow-hidden shadow-sm">
+                                        {items.map((data, idx) => {
+                                            const date = parseISO(data.time);
+                                            const Icon = getWeatherIcon(data.code);
 
-                                    return (
-                                        <div
-                                            key={data.time}
-                                            className="flex flex-col items-center justify-between min-w-[80px] p-4 rounded-2xl snap-start shrink-0 border bg-zinc-50 border-zinc-200 dark:bg-zinc-800/50 dark:border-zinc-700/50"
-                                        >
-                                            <span className="text-sm mb-3 text-zinc-500 dark:text-zinc-400">
-                                                {format(date, "H:mm")}
-                                            </span>
-                                            <Icon className={`w-8 h-8 mb-3 ${getWeatherColor(data.code)}`} />
-                                            <span className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-                                                {Math.round(data.temp)}°
-                                            </span>
-                                        </div>
-                                    );
-                                })}
-                            </div>
+                                            return (
+                                                <div
+                                                    key={data.time}
+                                                    className={`flex flex-col items-center justify-between min-w-[80px] p-4 snap-start shrink-0 ${idx !== 0 ? "border-l border-zinc-200/60 dark:border-zinc-700/30" : ""
+                                                        }`}
+                                                >
+                                                    <span className="text-sm mb-3 text-zinc-500 dark:text-zinc-400">
+                                                        {format(date, "H:mm")}
+                                                    </span>
+                                                    <Icon className={`w-8 h-8 mb-3 ${getWeatherColor(data.code)}`} />
+                                                    <span className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+                                                        {Math.round(data.temp)}°
+                                                    </span>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            ))}
                         </div>
 
                         <div className="mt-6 flex justify-between gap-4">
