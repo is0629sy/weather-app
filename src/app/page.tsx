@@ -127,8 +127,8 @@ export default function Home() {
             </h1>
           </div>
           <p className="text-zinc-500 dark:text-zinc-400 text-center max-w-xl">
-            OpenWeatherMap APIを活用した高機能天気ダッシュボード。<br className="hidden sm:block" />
-            都市を検索して追加し、最大6件までの気象情報をリアルタイムで管理します。
+            複数地点の気象情報をリアルタイムで管理する高機能な天気ダッシュボード。<br className="hidden sm:block" />
+            都市名を検索し、最大6件までの地点を追加できます。
           </p>
         </header>
 
@@ -138,6 +138,12 @@ export default function Home() {
             onLocationSelect={handleLocationPreview}
           />
         </section>
+
+        <div className="flex flex-col items-center mb-12 space-y-4">
+          <p className="text-zinc-500 dark:text-zinc-400 text-center max-w-2xl">
+            日本語で検索できない場合はアルファベットでの検索をお試しください。
+          </p>
+        </div>
 
         {/* 天気カードグリッド */}
         <section className="relative z-10">
