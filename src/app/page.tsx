@@ -196,6 +196,19 @@ export default function Home() {
         onReplace={handleReplaceConfirm}
         onCancel={() => setIsReplaceOpen(false)}
       />
+
+      {/* フッター */}
+      <footer className="mt-16 py-8 border-t border-zinc-200 dark:border-zinc-800">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <p className="text-center text-sm text-zinc-500 dark:text-zinc-400">
+            &copy; {(() => {
+              const currentYear = new Date().getFullYear();
+              const startYear = 2026;
+              return currentYear === startYear ? startYear : `${startYear}-${currentYear}`;
+            })()} is0629sy. All rights reserved.
+          </p>
+        </div>
+      </footer>
     </main>
   );
 }
